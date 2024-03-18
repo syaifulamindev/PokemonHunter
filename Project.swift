@@ -1,31 +1,32 @@
 import ProjectDescription
+import ProjectDescriptionHelpers
 
-let project = Project(
-    name: "PokemonHunter",
-    targets: [
-        .target(
-            name: "PokemonHunter",
-            destinations: .iOS,
-            product: .app,
-            bundleId: "io.tuist.PokemonHunter",
-            infoPlist: .extendingDefault(
-                with: [
-                    "UILaunchStoryboardName": "LaunchScreen.storyboard",
-                ]
-            ),
-            sources: ["PokemonHunter/Sources/**"],
-            resources: ["PokemonHunter/Resources/**"],
-            dependencies: []
-        ),
-        .target(
-            name: "PokemonHunterTests",
-            destinations: .iOS,
-            product: .unitTests,
-            bundleId: "io.tuist.PokemonHunterTests",
-            infoPlist: .default,
-            sources: ["PokemonHunter/Tests/**"],
-            resources: [],
-            dependencies: [.target(name: "PokemonHunter")]
-        ),
-    ]
-)
+
+/*
+                +-------------+
+                |             |
+                |     App     | Contains PokemonHunter App target and PokemonHunter unit-test target
+                |             |
+         +------+-------------+-------+
+         |         depends on         |
+         |                            |
+ +----v-----+                   +-----v-----+
+ |          |                   |           |
+ |   Kit    |                   |     UI    |   Two independent frameworks to share code and start modularising your app
+ |          |                   |           |
+ +----------+                   +-----------+
+
+ */
+
+// MARK: - Project
+
+// Creates our project using a helper function defined in ProjectDescriptionHelpers
+
+let project = ProjectBuilder("PokemonHunter")
+    .addModule("PokemonHunterKit", dependencies: [
+        
+    ])
+    .addModule("PokemonHunterUI", dependencies: [
+        
+    ])
+    .build()
