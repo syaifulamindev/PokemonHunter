@@ -22,9 +22,10 @@ import ProjectDescriptionHelpers
 
 // Creates our project using a helper function defined in ProjectDescriptionHelpers
 
-let project = ProjectBuilder("PokemonHunter")
+let project = ProjectBuilder("PokemonHunter", packages: [])
     .addModule("PokemonHunterKit", dependencies: [
-        
+        .external(name: "ComposableArchitecture"),
+        .external(name: "PokemonAPI")
     ])
     .addModule("PokemonHunterUI", dependencies: [
         
