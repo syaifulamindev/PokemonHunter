@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         
         window?.rootViewController = PokemonListViewController(
-            store: Store<PokemonList.State, PokemonList.Action>(initialState: PokemonList.State(), reducer: pokemonListReducer, environment: PokemonList.Environment())
+            store: Store<PokemonList.State, PokemonList.Action>(initialState: .init(), reducer: { PokemonList(environment: .init()) })
         )
         window?.makeKeyAndVisible()
         

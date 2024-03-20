@@ -9,6 +9,12 @@
 import PokemonAPI
 import ComposableArchitecture
 
+
+public struct Pokemon: Hashable {
+    let id: Int
+    let name: String
+}
+
 public class PokemonService {
     public var pokemonAPI: PokemonAPI = .init()
     
@@ -20,45 +26,36 @@ public class PokemonService {
     }
     
     var paginationState: PaginationState<PKMPokemon> {
-        pokemonListPage == nil ? initialPaginationState : .continuing(pokemonListPage!, .first)
-    }
-    
-//    public func fetchPokemonList() -> Effect<[String], Error> {
-//        do {
-//            return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Effect<[String], Error>, Error>) in
-//                pokemonAPI.pokemonService.fetchPokemonList(paginationState: paginationState) { [weak self] result in
-//                    switch result {
-//                    case .success(let obj):
-//                        self?.pokemonListPage = obj
-//                        let pokemonListNames: [String] = obj.results?.compactMap { ($0 as? PKMNamedAPIResource)?.name } ?? []
-//    //                    continuation.resume(with: .success(pokemonListNames))
-//                        continuation.resume(with: .success(.init(value: pokemonListNames)))
-//                    case .failure(let error):
-//                        continuation.resume(with: .failure(error))
-//                    }
-//                }
-//            }
-//        } catch let error {
-//            return .init(error: error)
-//        }
-//
-//
-//    }
-    
-    public func fetchPokemonList() -> Effect<[String], Error> {
-        .future { [weak self] callback in
-            guard let self = self else { return }
-            self.pokemonAPI.pokemonService.fetchPokemonList(paginationState: self.paginationState) { [weak self] result in
-                switch result {
-                case .success(let obj):
-                    self?.pokemonListPage = obj
-                    let pokemonListNames: [String] = obj.results?.compactMap { ($0 as? PKMNamedAPIResource)?.name } ?? []
-    //                    continuation.resume(with: .success(pokemonListNames))
-                    callback(.success(pokemonListNames))
-                case .failure(let error):
-                    callback(.failure(error))
-                }
-            }
+        guard let pokemonListPage else {
+            return initialPaginationState
         }
+        return .continuing(pokemonListPage, .next)
     }
+    
+    public func fetchPokemonList() async -> Result<[Pokemon], Error> {
+        
+        await withCheckedContinuation { continuation in
+            pokemonAPI.pokemonService.fetchPokemonList(paginationState: paginationState) { [weak self] result in
+                self?.pokemonListPage = try? result.get()
+                
+                let mappedResult = result.map {
+                    guard let namedAPIResources = ($0.results as?[PKMNamedAPIResource<PKMPokemon>]) else {
+                        return [Pokemon]()
+                    }
+                    return namedAPIResources.compactMap {
+                        guard
+                            let idString = $0.url?.split(separator: "/").last,
+                            let idInt = Int(idString),
+                            let name = $0.name
+                        else { return nil }
+                        return Pokemon(id: idInt, name: name)
+                    }
+                }
+                continuation.resume(with: .success(mappedResult))
+            }
+
+        }
+
+    }
+    
 }

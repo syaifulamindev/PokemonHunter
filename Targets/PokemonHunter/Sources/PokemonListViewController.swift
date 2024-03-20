@@ -17,10 +17,25 @@ class PokemonListViewController: UIViewController {
 //    private var cancellables: Set<AnyCancellable> = .init()
     private var cancellables: [AnyCancellable] = []
     
-    let button = UIButton(type: .system)
-    let button2 = UIButton(type: .system)
-    let button3 = UIButton(type: .system)
-    let label = UILabel()
+    lazy var undoButton: UIButton = {
+        button("Undo", imageName: "arrow.uturn.backward.circle", hintImageName: "arrow.uturn.backward.circle.fill", selector: #selector(undo))
+    }()
+    
+    lazy var catchButton: UIButton = {
+        button("Catch", imageName: "target", selector: #selector(`catch`), config: largeImageConfig)
+    }()
+    
+    lazy var shiftButton: UIButton = {
+        button("Shift", imageName: "chevron.right.circle", hintImageName: "chevron.right.circle.fill", selector: #selector(shift))
+    }()
+    
+    lazy var loadButton: UIButton = {
+        button("Load", imageName: "arrow.clockwise.icloud", hintImageName: "arrow.clockwise.icloud.fill", selector: #selector(fetchNext))
+    }()
+    
+    lazy var favoriteButton: UIButton = {
+        button("Favorite", imageName: "star.circle", hintImageName: "star.circle.fill", selector: #selector(favorite))
+    }()
     
     let cardImages = [
         UIImage(systemName: "square.and.arrow.up") ?? .init(),
@@ -33,14 +48,11 @@ class PokemonListViewController: UIViewController {
     var counter: Int = 0
     init(store: Store<PokemonList.State, PokemonList.Action>) {
         self.store = store
-//        self.viewStore = ViewStore(
-//          store,
-//          observe: { $0 },
-//          removeDuplicates: { $0 == $1 }
-//        )
-        self.viewStore = ViewStore(store.scope(state: { $0.view }, action: ViewAction.view), removeDuplicates: { viewState1, viewState2 in
-            false
-        })
+        self.viewStore = ViewStore(
+          store,
+          observe: { $0 },
+          removeDuplicates: { $0 == $1 }
+        )
         
         super.init(nibName: nil, bundle: nil)
         
@@ -50,6 +62,8 @@ class PokemonListViewController: UIViewController {
     required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
+    
+    let largeImageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .bold, scale: .large)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,58 +75,39 @@ class PokemonListViewController: UIViewController {
         cardStack.dataSource = self
         cardStack.delegate = self
         
+        buttonStackView.addArrangedSubview(undoButton)
+        buttonStackView.addArrangedSubview(favoriteButton)
+        buttonStackView.addArrangedSubview(catchButton)
+        buttonStackView.addArrangedSubview(loadButton)
+        buttonStackView.addArrangedSubview(shiftButton)
         
+       
+        viewStore.$isLoading.sink { isLoading in
+            print("$isLoading: \(isLoading)")
+        }
+        .store(in: &cancellables)
         
-        let normalImageConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .bold, scale: .large)
-        let largeImageConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .bold, scale: .large)
+        viewStore.$pokemonList.sink { list in
+            
+            print("viewStorePublisher \(self.counter): \(list)")
+        }
+        .store(in: &cancellables)
         
+        store.send(.loadPokemons)
         
-        if let image = UIImage(systemName: "arrow.uturn.backward.circle", withConfiguration: normalImageConfig), let fillImage = UIImage(systemName: "arrow.uturn.backward.circle.fill", withConfiguration: normalImageConfig) {
+    }
+    
+    func button(_ hintTitle: String, imageName: String, hintImageName: String? = nil, selector: Selector, config: UIImage.SymbolConfiguration = .init(pointSize: 16, weight: .bold, scale: .large)) -> UIButton {
+        let button: UIButton = .init(type: .system)
+        
+        if let image = UIImage(systemName: imageName, withConfiguration: config), let fillImage = UIImage(systemName: hintImageName ?? imageName, withConfiguration: config) {
             button.setImage(image, for: .normal)
             button.setImage(fillImage, for: .highlighted)
         } else {
             button.setTitle("Undo", for: .normal)
         }
-        button.addTarget(self, action: #selector(undo), for: .touchUpInside)
-        
-        if let image = UIImage(systemName: "target", withConfiguration: largeImageConfig) {
-            button2.setImage(image, for: .normal)
-        } else {
-            button2.setTitle("Catch", for: .normal)
-        }
-        button2.addTarget(self, action: #selector(`catch`), for: .touchUpInside)
-        
-        if let image = UIImage(systemName: "chevron.right.circle", withConfiguration: normalImageConfig), let fillImage = UIImage(systemName: "chevron.right.circle.fill", withConfiguration: normalImageConfig) {
-            button3.setImage(image, for: .normal)
-            button3.setImage(fillImage, for: .highlighted)
-        } else {
-            button3.setTitle("Shift", for: .normal)
-        }
-
-        button3.addTarget(self, action: #selector(shift), for: .touchUpInside)
-//        arrow.clockwise.icloud untuk reload
-        
-        buttonStackView.addArrangedSubview(button)
-        buttonStackView.addArrangedSubview(button2)
-        buttonStackView.addArrangedSubview(button3)
-        
-        
-//        observe(\.store, changeHandler: { controller, kvoc in
-//            kvoc.newValue.
-//        })
-        
-        viewStore.publisher.pokemonList
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] list in
-            guard let self = self else { return }
-                self.counter += 1
-                print("viewStorePublisher \(self.counter): \(list)")
-        }
-        .store(in: &cancellables)
-        label.text = "test Label"
-        view.addSubview(label)
-        label.anchorToSuperview()
-        
+        button.addTarget(self, action: selector, for: .touchUpInside)
+        return button
     }
     
     @objc func undo() {
@@ -120,12 +115,19 @@ class PokemonListViewController: UIViewController {
     }
     
     @objc func `catch`() {
-//        store.send(.pokemonsResponse(["new pokemon from button"]))
-        viewStore.send(.pokemonsResponse(.success(["`catch`"])))
+
     }
     
     @objc func shift() {
         cardStack.shift(animated: true)
+    }
+    
+    @objc func fetchNext() {
+        store.send(.loadPokemons)
+    }
+    
+    @objc func favorite() {
+        print("favorite")
     }
     
     func card(fromImage image: UIImage) -> SwipeCard {
@@ -188,7 +190,7 @@ extension PokemonListViewController: SwipeCardStackDataSource {
 
 extension PokemonListViewController: SwipeCardStackDelegate {
     func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-        viewStore.send(.pokemonsResponse(.success(["cardStack"])))
+        
     }
 }
 

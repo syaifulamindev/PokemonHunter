@@ -9,8 +9,8 @@
 import UIKit
 import ComposableArchitecture
 import PokemonAPI
-
-let pokemonListReducer = Reducer<PokemonList.State, PokemonList.Action, PokemonList.Environment> { state, action, environment in
+/*
+let pokemonListReducer = Reducer<PokemonList.State, PokemonList.Action> { state, action in
     switch action {
     case .isLoading(let loading):
         state.isLoading = loading
@@ -53,23 +53,76 @@ let pokemonListReducer = Reducer<PokemonList.State, PokemonList.Action, PokemonL
         return .none
     }
 }
+*/
 
-struct PokemonList {
-    struct Environment {
-        public var mainQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue.main.eraseToAnyScheduler()
-        public var pokemonAPI: PokemonAPI = .init()
+extension PokemonList.State: Hashable {
+    static func == (lhs: PokemonList.State, rhs: PokemonList.State) -> Bool {
+        lhs.isLoading == rhs.isLoading &&
+        lhs.pokemonList == rhs.pokemonList
     }
     
-    struct State: Equatable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(isLoading)
+        hasher.combine(pokemonList)
+    }
+}
+
+
+struct PokemonList: Reducer {
+    struct Environment {
+        public var mainQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue.main.eraseToAnyScheduler()
+        public var pokemonService: PokemonService = .init()
+    }
+    
+    class State {
+        
+        @Published
         var isLoading: Bool = false
-        var pokemonList: [String] = []
+        
+        @Published
+        var pokemonList: [Pokemon] = []
+        
+        
     }
     
     enum Action {
         case `catch`
         case loadPokemons
-        case pokemonsResponse(Result<[String], Error>)
+        case pokemonsResponse(Result<[Pokemon], Error>)
         case isLoading(Bool)
+    }
+    
+    var environment: Environment = .init()
+    var body: some ReducerOf<PokemonList> {
+        Reduce { state, action in
+            switch action {
+            case .isLoading(let loading):
+                state.isLoading = loading
+                return .none
+            case .loadPokemons:
+                return .run { send in
+                    await send(.isLoading(true))
+                    await send(
+                        .pokemonsResponse(
+                            await environment.pokemonService.fetchPokemonList()
+                        )
+                    )
+                    await send(.isLoading(false))
+        
+                }
+            case .pokemonsResponse(let response):
+                switch response {
+                case .success(let pokemonList):
+                    state.pokemonList = pokemonList
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+                
+                return .none
+            case .catch:
+                return .none
+            }
+        }
     }
 }
 
