@@ -11,6 +11,8 @@ import PackageDescription
         productTypes: [
             "ComposableArchitecture": .framework,
             "PokemonAPI": .framework,
+            "Shuffle": .framework,
+            "PopBounceButton": .framework
         ]
     )
 #endif
@@ -19,7 +21,10 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "0.9.0"),
         .package(url: "https://github.com/kinkofer/PokemonAPI.git", from: "6.1.1"),
+        .package(url: "https://github.com/mac-gallagher/Shuffle.git", from: "0.4.2"),
+//        .package(url: "https://github.com/mac-gallagher/PopBounceButton.git", from: "1.1.1"),
+
     ]
 )

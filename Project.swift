@@ -28,6 +28,6 @@ let project = ProjectBuilder("PokemonHunter")
         .external(name: "PokemonAPI")
     ])
     .addModule("PokemonHunterUI", dependencies: [
-        
+        .external(name: "Shuffle")
     ])
     .build()
