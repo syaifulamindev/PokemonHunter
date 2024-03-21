@@ -10,6 +10,8 @@ import UIKit
 import ComposableArchitecture
 import Shuffle
 import Combine
+import PokemonHunterUI
+import PokemonHunterKit
 
 class PokemonListViewController: UIViewController {
     let cardStack = SwipeCardStack()
@@ -138,27 +140,18 @@ class PokemonListViewController: UIViewController {
     @objc func favorite() {
         print("favorite")
     }
-    
-    func card(id pokemonID: Int) -> SwipeCard {
+
+    func card(_ pokemon: Pokemon) -> SwipeCard {
         let card = SwipeCard()
-        card.swipeDirections = [.left, .right]
-        let imageView = UIImageView()
-        let imageURLString =  "http://localhost:3000/sprites/pokemon/\(pokemonID)"
-        imageView.load(url: URL(string: imageURLString)!)
-        imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .lightGray
-        card.content = imageView
-        
-        let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .systemGray6
-        
-        let rightOverlay = UIView()
-        rightOverlay.backgroundColor = .darkGray
-        
-        card.setOverlays([.left: leftOverlay, .right: rightOverlay])
-        card.layer.cornerRadius = 24
-        card.clipsToBounds = true
-        
+        card.footerHeight = 80
+        card.swipeDirections = [.left, .up, .right]
+        for direction in card.swipeDirections {
+          card.setOverlay(CardOverlay(direction: direction), forDirection: direction)
+        }
+        let urlString = "http://localhost:3000/sprites/pokemon/\(pokemon.id)"
+        card.content = CardContentView(withUrlString: urlString)
+        card.footer = CardFooterView(withTitle: "\(pokemon.name)", subtitle: urlString)
+
         return card
     }
     
@@ -195,7 +188,7 @@ class PokemonListViewController: UIViewController {
 
 extension PokemonListViewController: SwipeCardStackDataSource {
     func cardStack(_ cardStack: SwipeCardStack, cardForIndexAt index: Int) -> SwipeCard {
-        return card(id: viewStore.pokemonList[index].id)
+        return card(viewStore.pokemonList[index])
     }
     
     func numberOfCards(in cardStack: SwipeCardStack) -> Int {

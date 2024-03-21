@@ -19,9 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
         window?.makeKeyAndVisible()
         
-        PokemonHunterKit.hello()
-        PokemonHunterUI.hello()
-        
         return true
     }
     
