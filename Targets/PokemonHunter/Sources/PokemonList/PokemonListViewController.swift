@@ -97,15 +97,10 @@ class PokemonListViewController: UIViewController {
         
     }
     
-    var gradientLayer: CAGradientLayer?
+    var gradientLayer: CAGradientLayer = .init()
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-//        guard !backgroundUpdated else { return }
-//        backgroundUpdated = true
-        if gradientLayer == nil {
-            gradientLayer = .init()
-        }
-        configureBackgroundGradient(view: view)
+        configureBackgroundGradient(gradientLayer: &gradientLayer, view: view)
     }
     
     func button(_ hintTitle: String, imageName: String, hintImageName: String? = nil, selector: Selector, config: UIImage.SymbolConfiguration = .init(pointSize: 16, weight: .bold, scale: .large)) -> UIButton {
@@ -153,16 +148,6 @@ class PokemonListViewController: UIViewController {
         card.footer = CardFooterView(withTitle: "\(pokemon.name)", subtitle: urlString)
 
         return card
-    }
-    
-    private func configureBackgroundGradient(view: UIView) {
-//        let backgroundGray = UIColor(red: 244 / 255, green: 247 / 255, blue: 250 / 255, alpha: 1)
-        guard let gradientLayer else { return }
-        let background: UIColor = UIColor(red: 253 / 255, green: 255 / 255, blue: 226 / 255, alpha: 1)
-//        let background: UIColor = .systemGray6
-        gradientLayer.frame = view.bounds
-        view.layer.insertSublayer(gradientLayer, at: 0)
-        gradientLayer.colors = [UIColor.white.cgColor, background.cgColor]
     }
     
     private func layoutCardStackView() {

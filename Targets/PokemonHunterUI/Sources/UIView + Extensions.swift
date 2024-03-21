@@ -78,10 +78,11 @@ public extension UIView {
 // MARK: Shadow
 public extension UIView {
     
-    func shadow(radius: CGFloat,
-                     opacity: Float,
-                     offset: CGSize,
-                     color: UIColor = .black) {
+    
+    func shadow(radius: CGFloat = 8,
+                opacity: Float = 0.2,
+                offset: CGSize = CGSize(width: 0, height: 2),
+                color: UIColor = .black) {
         layer.shadowRadius = radius
         layer.shadowOpacity = opacity
         layer.shadowOffset = offset
