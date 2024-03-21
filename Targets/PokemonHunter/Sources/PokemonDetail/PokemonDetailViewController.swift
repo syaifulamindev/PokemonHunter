@@ -91,11 +91,22 @@ class PokemonDetailViewController: UIViewController {
         .store(in: &cancellables)
         
         viewStore.send(.loadPokemonDetail(viewStore.pokemon))
+        
+        viewStore.$showRenameDialog
+            .sink { [weak self] show in
+                guard show else { return }
+                let controller = TextfieldAlertController(title: "Rename", message: "update your pokemon name", preferredStyle: .alert)
+                controller.setup(placeholder: "Pockemon Nickname", actionTitle: "OK") { [weak self] newNickname in
+                    guard let self else { return }
+                    self.store.send(.renamePokemon(self.viewStore.state.pokemon, nickname: newNickname))
+                }
+                self?.navigationController?.present(controller, animated: true)
+            }.store(in: &cancellables)
     }
     
     @objc
     func `catch`() {
-        print("catch")
+        store.send(.showNicknameDialog(viewStore.pokemon))
     }
     
     func populatePokemonDetail() {

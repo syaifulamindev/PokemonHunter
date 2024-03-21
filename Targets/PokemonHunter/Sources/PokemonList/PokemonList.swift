@@ -41,18 +41,17 @@ struct PokemonList: Reducer {
         
         @Published
         var showRenameDialog: Bool = false
-        
         var currentRenamedPokemon: Pokemon?
         
-        @Published
-        var currentPokemonIndex: Int?
     }
     
     enum Action {
-        case catchPokemon(Pokemon)
+        
         case loadPokemons
         case pokemonsResponse(Result<[Pokemon], Error>)
         case isLoading(Bool)
+        
+        case catchPokemon(Pokemon)
         case catchPokemonResponse(Result<CatchPokemon, Error>)
         case showNicknameDialog(_ pokemon: Pokemon)
         case renamePokemon(_ pokemon: Pokemon?, nickname: String?)
