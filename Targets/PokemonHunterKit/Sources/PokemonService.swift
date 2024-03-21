@@ -8,15 +8,26 @@
 
 import PokemonAPI
 import ComposableArchitecture
+import Foundation
 
 
-public struct Pokemon: Hashable {
+public struct Pokemon: Codable, Hashable {
     public let id: Int
     public let name: String
     public init(id: Int, name: String) {
         self.id = id
         self.name = name
     }
+}
+
+public struct CatchPokemon: Codable {
+    public let `catch`: Bool
+    public var pokemon: Pokemon?
+}
+
+public struct RenamePokemon: Codable {
+    public let nickname: String
+    public let message: String
 }
 
 //public class PokemonDetail: PKMPokemon { }
@@ -36,6 +47,7 @@ extension PokemonDetail: Hashable {
 
 public class PokemonService {
     public var pokemonAPI: PokemonAPI = .init()
+    public var additionalService: AdditionalPokemonService = .init()
     
     private var pokemonListPage: PKMPagedObject<PKMPokemon>?
     private let initialPaginationState: PaginationState<PKMPokemon> = .initial(pageLimit: 20)
@@ -87,4 +99,14 @@ public class PokemonService {
         }
     }
     
+    public func catchPokemon(_ pokemon: Pokemon) async -> Result<CatchPokemon, Error> {
+        await additionalService.fetch(.catch)
+    }
+    
+    public func renamePokemon(_ pokemon: Pokemon?, nickname: String?) async -> Result<RenamePokemon, Error> {
+        guard let pokemon else { return .failure(URLError(.badURL))}
+        return await additionalService.fetch(.rename(pokemon: pokemon, nickname: nickname))
+    }
+    
 }
+

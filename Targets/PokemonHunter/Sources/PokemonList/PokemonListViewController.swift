@@ -106,7 +106,16 @@ class PokemonListViewController: UIViewController {
                 
             }
             .store(in: &cancellables)
-        
+        viewStore.$showRenameDialog
+            .sink { [weak self] show in
+                guard show else { return }
+                let controller = TextfieldAlertController(title: "Rename", message: "update your pokemon name", preferredStyle: .alert)
+                controller.setup(placeholder: "Pockemon Nickname", actionTitle: "OK") { [weak self] newNickname in
+                    guard let self else { return }
+                    self.store.send(.renamePokemon(self.viewStore.state.currentRenamedPokemon, nickname: newNickname))
+                }
+                self?.navigationController?.present(controller, animated: true)
+            }.store(in: &cancellables)
     }
     
     var gradientLayer: CAGradientLayer = .init()
@@ -133,7 +142,9 @@ class PokemonListViewController: UIViewController {
     }
     
     @objc func `catch`() {
-
+        guard let index = cardStack.topCardIndex else { return }
+        let pokemon = viewStore.pokemonList[index]
+        store.send(.catchPokemon(pokemon))
     }
     
     @objc func shift() {
@@ -191,6 +202,8 @@ extension PokemonListViewController: SwipeCardStackDataSource {
     func numberOfCards(in cardStack: SwipeCardStack) -> Int {
         return viewStore.pokemonList.count
     }
+    
+    
 }
 
 extension PokemonListViewController: SwipeCardStackDelegate {
@@ -199,9 +212,10 @@ extension PokemonListViewController: SwipeCardStackDelegate {
         let card = cardStack.card(forIndexAt: index)
         let cardContent = (card?.content as? CardContentView)
         let image = cardContent?.image
-        
         viewStore.state.pokemonDetailState = .init(pokemon: pokemon, pokemonImage: image)
     }
+    
+    
 }
 
 extension PokemonListViewController {

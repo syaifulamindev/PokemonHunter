@@ -25,7 +25,8 @@ import ProjectDescriptionHelpers
 let project = ProjectBuilder("PokemonHunter")
     .addModule("PokemonHunterKit", dependencies: [
         .external(name: "ComposableArchitecture"),
-        .external(name: "PokemonAPI")
+        .external(name: "PokemonAPI"),
+        .external(name: "Alamofire")
     ])
     .addModule("PokemonHunterUI", dependencies: [
         .external(name: "Shuffle")

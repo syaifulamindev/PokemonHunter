@@ -12,7 +12,8 @@ import PackageDescription
             "ComposableArchitecture": .framework,
             "PokemonAPI": .framework,
             "Shuffle": .framework,
-            "PopBounceButton": .framework
+//            "PopBounceButton": .framework,
+            "Alamofire": .framework
         ]
     )
 #endif
@@ -24,7 +25,8 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.9.2"),
         .package(url: "https://github.com/kinkofer/PokemonAPI.git", from: "6.1.1"),
         .package(url: "https://github.com/mac-gallagher/Shuffle.git", from: "0.4.2"),
-//        .package(url: "https://github.com/mac-gallagher/PopBounceButton.git", from: "1.1.1"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.9.0"),
+        
 
     ]
 )
