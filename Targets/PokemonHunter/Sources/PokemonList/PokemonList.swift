@@ -8,8 +8,8 @@
 
 import UIKit
 import ComposableArchitecture
-import PokemonAPI
 import PokemonHunterKit
+
 extension PokemonList.State: Hashable {
     static func == (lhs: PokemonList.State, rhs: PokemonList.State) -> Bool {
         lhs.isLoading == rhs.isLoading &&

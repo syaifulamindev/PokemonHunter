@@ -56,7 +56,7 @@ public class CardContentView: UIView {
         backgroundView.addSubview(imageView)
         backgroundView.backgroundColor = .white
         imageView.anchorToSuperview()
-        applyShadow(radius: 8, opacity: 0.2, offset: CGSize(width: 0, height: 2))
+        shadow(radius: 8, opacity: 0.2, offset: CGSize(width: 0, height: 2))
         backgroundView.layer.insertSublayer(gradientLayer, above: imageView.layer)
     }
     

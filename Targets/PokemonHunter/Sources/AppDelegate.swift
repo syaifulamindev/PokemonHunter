@@ -14,9 +14,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         
-        window?.rootViewController = PokemonListViewController(
-            store: Store<PokemonList.State, PokemonList.Action>(initialState: .init(), reducer: { PokemonList(environment: .init()) })
-        )
+//        window?.rootViewController = PokemonListViewController(
+//            store: Store<PokemonList.State, PokemonList.Action>(initialState: .init(), reducer: { PokemonList(environment: .init()) })
+//        )
+        window?.rootViewController = PokemonDetailViewController()
+        
         window?.makeKeyAndVisible()
         
         return true

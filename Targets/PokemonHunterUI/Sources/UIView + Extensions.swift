@@ -7,6 +7,8 @@
 //
 
 import UIKit
+
+// MARK: Layout
 public extension UIView {
     
     @discardableResult
@@ -49,6 +51,22 @@ public extension UIView {
     }
     
     @discardableResult
+    func anchor(_ centerX:NSLayoutXAxisAnchor, constant: CGFloat = 0) -> NSLayoutConstraint {
+        translatesAutoresizingMaskIntoConstraints = false
+        let anchor = centerXAnchor.constraint(equalTo: centerX, constant: constant)
+        anchor.isActive = true
+        return anchor
+    }
+    
+    @discardableResult
+    func anchor(_ centerY:NSLayoutYAxisAnchor, constant: CGFloat = 0) -> NSLayoutConstraint {
+        translatesAutoresizingMaskIntoConstraints = false
+        let anchor = centerYAnchor.constraint(equalTo: centerY, constant: constant)
+        anchor.isActive = true
+        return anchor
+    }
+    
+    @discardableResult
     func anchorToSuperview() -> [NSLayoutConstraint] {
         return anchor(top: superview?.topAnchor,
                       left: superview?.leftAnchor,
@@ -57,9 +75,10 @@ public extension UIView {
     }
 }
 
+// MARK: Shadow
 public extension UIView {
     
-    func applyShadow(radius: CGFloat,
+    func shadow(radius: CGFloat,
                      opacity: Float,
                      offset: CGSize,
                      color: UIColor = .black) {
@@ -69,4 +88,11 @@ public extension UIView {
         layer.shadowColor = color.cgColor
     }
     
+}
+
+// MARK: Radius
+public extension UIView {
+    func round(_ radius: CGFloat) {
+        layer.cornerRadius = radius
+    }
 }
