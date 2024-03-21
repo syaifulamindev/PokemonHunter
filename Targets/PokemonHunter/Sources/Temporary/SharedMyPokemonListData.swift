@@ -7,10 +7,11 @@
 //
 
 import Foundation
+import PokemonHunterKit
 
 class SharedMyPokemonListData {
     static var shared: SharedMyPokemonListData = .init()
     private init() {}
     
-    var myPokemons: [PokemonDetail] = []
+    var myPokemons: [Pokemon] = []
 }

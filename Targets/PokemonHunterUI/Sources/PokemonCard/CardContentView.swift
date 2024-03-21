@@ -49,6 +49,7 @@ public class CardContentView: UIView {
         }
     }
     
+    
     required init?(coder aDecoder: NSCoder) {
         return nil
     }

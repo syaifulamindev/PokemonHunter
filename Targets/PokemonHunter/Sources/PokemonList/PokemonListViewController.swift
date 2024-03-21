@@ -106,6 +106,21 @@ class PokemonListViewController: UIViewController {
                 
             }
             .store(in: &cancellables)
+        
+        viewStore.$myPokemonListState
+            .sink { [weak self] state in
+                guard let self else { return }
+                if let state {
+                    let newStore = StoreOf<MyPokemonList>(initialState: state, reducer: { MyPokemonList() })
+                    self.navigationController?.pushViewController(
+                        MyPokemonListViewController(store: newStore),
+                        animated: true)
+                } else {
+                    self.navigationController?.popToViewController(self, animated: true)
+                }
+                
+            }
+            .store(in: &cancellables)
         viewStore.$showRenameDialog
             .sink { [weak self] show in
                 guard show else { return }
@@ -156,7 +171,8 @@ class PokemonListViewController: UIViewController {
     }
     
     @objc func favorite() {
-        print("favorite")
+//        store.send(.showMyPokemonList)
+        viewStore.state.myPokemonListState = .init()
     }
 
     func card(_ pokemon: Pokemon) -> SwipeCard {

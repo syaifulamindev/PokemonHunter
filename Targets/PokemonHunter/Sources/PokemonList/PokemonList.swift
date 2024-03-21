@@ -40,13 +40,15 @@ struct PokemonList: Reducer {
         var pokemonDetailState: PokemonDetail.State?
         
         @Published
+        var myPokemonListState: MyPokemonList.State?
+        
+        @Published
         var showRenameDialog: Bool = false
         var currentRenamedPokemon: Pokemon?
         
     }
     
     enum Action {
-        
         case loadPokemons
         case pokemonsResponse(Result<[Pokemon], Error>)
         case isLoading(Bool)
@@ -121,7 +123,10 @@ struct PokemonList: Reducer {
                     )
                 }
             case .renamePokemonResponse(.success(let renamePokemon)):
-                print("rename success, new name: \(renamePokemon)")
+                guard let pokemon = state.currentRenamedPokemon else { return .none }
+                SharedMyPokemonListData.shared.myPokemons.append(pokemon)
+                state.currentRenamedPokemon = nil
+                
                 return .none
             case .renamePokemonResponse(.failure(let error)):
                 print(error.localizedDescription)
@@ -131,6 +136,7 @@ struct PokemonList: Reducer {
                 state.currentRenamedPokemon = pokemon
                 state.showRenameDialog = true
                 return .none
+                
             }
         }
     }

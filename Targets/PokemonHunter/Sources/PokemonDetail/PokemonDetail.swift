@@ -84,50 +84,50 @@ struct PokemonDetail: Reducer {
             case .pokemonDetailResponse(.failure(let error)):
                 print(error.localizedDescription)
             case .catchPokemon(let pokemon):
-                            return .run { send in
-                                await send(.isLoading(true))
-                                await send(
-                                    .catchPokemonResponse(
-                                        await environment.pokemonService.catchPokemon(pokemon)
-                                            .map {
-                                                var newPokemon = $0
-                                                newPokemon.pokemon = pokemon
-                                                return newPokemon
-                                            }
-                                    )
-                                )
-                            }
-                        case .catchPokemonResponse(.success(let catchPokemon)):
-                            print("catchPokemon: \(catchPokemon)")
-                            guard catchPokemon.catch,
-                                  let pokemon = catchPokemon.pokemon else {
-                                return .none
-                            }
-                            
-                            return .run { send in
-                                await send(.showNicknameDialog(pokemon))
-                            }
-                        case .catchPokemonResponse(.failure(let error)):
-                            print(error.localizedDescription)
-                            return .none
-                        case .renamePokemon(let pokemon, let nickname):
-                            return .run { send in
-                                await send(
-                                    .renamePokemonResponse(
-                                        await environment.pokemonService.renamePokemon(pokemon, nickname: nickname)
-                                    )
-                                )
-                            }
-                        case .renamePokemonResponse(.success(let renamePokemon)):
-                            print("rename success, new name: \(renamePokemon)")
-                            return .none
-                        case .renamePokemonResponse(.failure(let error)):
-                            print(error.localizedDescription)
-                            return .none
-                        case .showNicknameDialog:
-                            //FIXME: DO SOMETHING HERE
-                            state.showRenameDialog = true
-                            return .none
+                return .run { send in
+                    await send(.isLoading(true))
+                    await send(
+                        .catchPokemonResponse(
+                            await environment.pokemonService.catchPokemon(pokemon)
+                                .map {
+                                    var newPokemon = $0
+                                    newPokemon.pokemon = pokemon
+                                    return newPokemon
+                                }
+                        )
+                    )
+                }
+            case .catchPokemonResponse(.success(let catchPokemon)):
+                print("catchPokemon: \(catchPokemon)")
+                guard catchPokemon.catch,
+                      let pokemon = catchPokemon.pokemon else {
+                    return .none
+                }
+                
+                return .run { send in
+                    await send(.showNicknameDialog(pokemon))
+                }
+            case .catchPokemonResponse(.failure(let error)):
+                print(error.localizedDescription)
+                return .none
+            case .renamePokemon(let pokemon, let nickname):
+                return .run { send in
+                    await send(
+                        .renamePokemonResponse(
+                            await environment.pokemonService.renamePokemon(pokemon, nickname: nickname)
+                        )
+                    )
+                }
+            case .renamePokemonResponse(.success(let renamePokemon)):
+                SharedMyPokemonListData.shared.myPokemons.append(state.pokemon)
+                return .none
+            case .renamePokemonResponse(.failure(let error)):
+                print(error.localizedDescription)
+                return .none
+            case .showNicknameDialog:
+                //FIXME: DO SOMETHING HERE
+                state.showRenameDialog = true
+                return .none
             }
             return .none
         }
