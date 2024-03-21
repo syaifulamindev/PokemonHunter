@@ -41,7 +41,7 @@ class PokemonListViewController: UIViewController {
     
     let store: Store<PokemonList.State, PokemonList.Action>
     let viewStore: ViewStore<ViewState, ViewAction>
-    var counter: Int = 0
+    
     init(store: Store<PokemonList.State, PokemonList.Action>) {
         self.store = store
         self.viewStore = ViewStore(
@@ -49,10 +49,7 @@ class PokemonListViewController: UIViewController {
           observe: { $0 },
           removeDuplicates: { $0 == $1 }
         )
-        
         super.init(nibName: nil, bundle: nil)
-        
-
     }
     
     required init?(coder: NSCoder) {
@@ -88,7 +85,6 @@ class PokemonListViewController: UIViewController {
             .sink { [weak self] list in
             guard let self else { return }
             
-            print("viewStorePublisher \(self.counter): \(list)")
             self.cardStack.reloadData()
         }
         .store(in: &cancellables)

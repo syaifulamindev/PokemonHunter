@@ -61,7 +61,7 @@ public class CardOverlay: UIView {
     }
 }
 
-private class CardOverlayLabelView: UIView {
+public class CardOverlayLabelView: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -69,7 +69,7 @@ private class CardOverlayLabelView: UIView {
         return label
     }()
     
-    init(withTitle title: String, color: UIColor, rotation: CGFloat) {
+    public init(withTitle title: String, color: UIColor, rotation: CGFloat) {
         super.init(frame: CGRect.zero)
         layer.borderColor = color.cgColor
         layer.borderWidth = 4

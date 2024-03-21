@@ -13,6 +13,25 @@ import ComposableArchitecture
 public struct Pokemon: Hashable {
     public let id: Int
     public let name: String
+    public init(id: Int, name: String) {
+        self.id = id
+        self.name = name
+    }
+}
+
+//public class PokemonDetail: PKMPokemon { }
+//public class PokemonDetail: PKMPokemon { }
+
+public typealias PokemonDetail = PKMPokemon
+
+extension PokemonDetail: Hashable {
+    public static func == (lhs: PokemonDetail, rhs: PokemonDetail) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 public class PokemonService {
@@ -56,6 +75,16 @@ public class PokemonService {
 
         }
 
+    }
+    
+    public func pokemonDetail(_ pokemon: Pokemon) async -> Result<PokemonDetail, Error> {
+        await withCheckedContinuation { continuation in
+            pokemonAPI.pokemonService.fetchPokemon(pokemon.id) { result in
+                continuation.resume(with: .success(result.map  {
+                    $0 
+                }))
+            }
+        }
     }
     
 }

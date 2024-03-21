@@ -22,7 +22,6 @@ extension PokemonList.State: Hashable {
     }
 }
 
-
 struct PokemonList: Reducer {
     struct Environment {
         public var mainQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue.main.eraseToAnyScheduler()
