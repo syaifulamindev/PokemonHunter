@@ -91,7 +91,7 @@ extension MyPokemonTableView: UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        UIScreen.main.bounds.height * 0.8
+        UIScreen.main.bounds.height * 0.3
     }
 }
 

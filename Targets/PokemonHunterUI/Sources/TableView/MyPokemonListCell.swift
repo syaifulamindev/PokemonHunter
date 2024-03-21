@@ -19,15 +19,23 @@ public class MyPokemonListCell: UITableViewCell {
     public override func awakeFromNib() {
         super.awakeFromNib()
         contentView.addSubview(content)
-        content.anchorToSuperview()
-        content.anchor(height: UIScreen.main.bounds.height * 80 / 100)
+        
+        
         content.isUserInteractionEnabled = false
     }
     
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubview(content)
-        content.anchorToSuperview()
+        content.anchor(top: safeAreaLayoutGuide.topAnchor,
+                       left: safeAreaLayoutGuide.leftAnchor,
+                       bottom: safeAreaLayoutGuide.bottomAnchor,
+                       right: safeAreaLayoutGuide.rightAnchor,
+        paddingTop: 8,
+        paddingLeft: 16,
+        paddingBottom: 8,
+        paddingRight: 16)
+//        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
     }
     
     required init?(coder: NSCoder) {
