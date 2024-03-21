@@ -14,10 +14,10 @@ PokemonHunter simple app to hunt a pokemon, catch, rename, and release it.
 ### Main features
 
 ### Pokemon List
-    - show a list of pokemons's names and picture 
-    - click pokemon will go to Pokemon Detail
+    - [X] show a list of pokemons's names and picture, other data and  is optional 
+    - [ ] click pokemon will go to Pokemon Detail
 ### Pokemon Detail
-    - 
+     
 ### My Pokemon List
 
 ## Quality Goals
