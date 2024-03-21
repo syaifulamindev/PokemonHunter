@@ -33,6 +33,9 @@ public class CardContentView: UIView {
         return gradient
     }()
     
+    public var image: UIImage? {
+        imageView.image
+    }
     public init(withImage image: UIImage?) {
         super.init(frame: .zero)
         imageView.image = image

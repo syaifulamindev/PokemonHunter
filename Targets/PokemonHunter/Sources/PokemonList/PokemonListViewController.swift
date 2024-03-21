@@ -90,6 +90,22 @@ class PokemonListViewController: UIViewController {
         .store(in: &cancellables)
         
         store.send(.loadPokemons)
+//        let actionCaseKeypath:KeyPath = PokemonList.Action.catch
+        
+        viewStore.$pokemonDetailState
+            .sink { [weak self] state in
+                guard let self else { return }
+                if let state {
+                    let pokemonDetailStore = StoreOf<PokemonDetail>(initialState: state, reducer: { PokemonDetail() })
+                    self.navigationController?.pushViewController(
+                        PokemonDetailViewController(store: pokemonDetailStore),
+                        animated: true)
+                } else {
+                    self.navigationController?.popToViewController(self, animated: true)
+                }
+                
+            }
+            .store(in: &cancellables)
         
     }
     
@@ -179,7 +195,12 @@ extension PokemonListViewController: SwipeCardStackDataSource {
 
 extension PokemonListViewController: SwipeCardStackDelegate {
     func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
+        let pokemon = viewStore.state.pokemonList[index]
+        let card = cardStack.card(forIndexAt: index)
+        let cardContent = (card?.content as? CardContentView)
+        let image = cardContent?.image
         
+        viewStore.state.pokemonDetailState = .init(pokemon: pokemon, pokemonImage: image)
     }
 }
 

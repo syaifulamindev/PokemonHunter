@@ -36,6 +36,8 @@ struct PokemonList: Reducer {
         @Published
         var pokemonList: [Pokemon] = []
         
+        @Published
+        var pokemonDetailState: PokemonDetail.State?
         
     }
     
