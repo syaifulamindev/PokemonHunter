@@ -11,8 +11,8 @@ import ComposableArchitecture
 
 
 public struct Pokemon: Hashable {
-    let id: Int
-    let name: String
+    public let id: Int
+    public let name: String
 }
 
 public class PokemonService {

@@ -37,12 +37,6 @@ class PokemonListViewController: UIViewController {
         button("Favorite", imageName: "star.circle", hintImageName: "star.circle.fill", selector: #selector(favorite))
     }()
     
-    let cardImages = [
-        UIImage(systemName: "square.and.arrow.up") ?? .init(),
-        UIImage(systemName: "eraser.line.dashed") ?? .init(),
-        UIImage(systemName: "highlighter") ?? .init()
-    ]
-    
     let store: Store<PokemonList.State, PokemonList.Action>
     let viewStore: ViewStore<ViewState, ViewAction>
     var counter: Int = 0
@@ -68,7 +62,7 @@ class PokemonListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        configureBackgroundGradient()
+//        configureBackgroundGradient()
         layoutButtonStackView()
         layoutCardStackView()
         
@@ -87,14 +81,29 @@ class PokemonListViewController: UIViewController {
         }
         .store(in: &cancellables)
         
-        viewStore.$pokemonList.sink { list in
+        viewStore.$pokemonList
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] list in
+            guard let self else { return }
             
             print("viewStorePublisher \(self.counter): \(list)")
+            self.cardStack.reloadData()
         }
         .store(in: &cancellables)
         
         store.send(.loadPokemons)
         
+    }
+    
+    var gradientLayer: CAGradientLayer?
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+//        guard !backgroundUpdated else { return }
+//        backgroundUpdated = true
+        if gradientLayer == nil {
+            gradientLayer = .init()
+        }
+        configureBackgroundGradient(view: view)
     }
     
     func button(_ hintTitle: String, imageName: String, hintImageName: String? = nil, selector: Selector, config: UIImage.SymbolConfiguration = .init(pointSize: 16, weight: .bold, scale: .large)) -> UIButton {
@@ -130,31 +139,37 @@ class PokemonListViewController: UIViewController {
         print("favorite")
     }
     
-    func card(fromImage image: UIImage) -> SwipeCard {
+    func card(id pokemonID: Int) -> SwipeCard {
         let card = SwipeCard()
         card.swipeDirections = [.left, .right]
-        let imageView = UIImageView(image: image)
+        let imageView = UIImageView()
+        let imageURLString =  "http://localhost:3000/sprites/pokemon/\(pokemonID)"
+        imageView.load(url: URL(string: imageURLString)!)
         imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .white
+        imageView.backgroundColor = .lightGray
         card.content = imageView
         
         let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .gray
+        leftOverlay.backgroundColor = .systemGray6
         
         let rightOverlay = UIView()
         rightOverlay.backgroundColor = .darkGray
         
         card.setOverlays([.left: leftOverlay, .right: rightOverlay])
+        card.layer.cornerRadius = 24
+        card.clipsToBounds = true
         
         return card
     }
     
-    private func configureBackgroundGradient() {
-        let backgroundGray = UIColor(red: 244 / 255, green: 247 / 255, blue: 250 / 255, alpha: 1)
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor.white.cgColor, backgroundGray.cgColor]
+    private func configureBackgroundGradient(view: UIView) {
+//        let backgroundGray = UIColor(red: 244 / 255, green: 247 / 255, blue: 250 / 255, alpha: 1)
+        guard let gradientLayer else { return }
+        let background: UIColor = UIColor(red: 253 / 255, green: 255 / 255, blue: 226 / 255, alpha: 1)
+//        let background: UIColor = .systemGray6
         gradientLayer.frame = view.bounds
         view.layer.insertSublayer(gradientLayer, at: 0)
+        gradientLayer.colors = [UIColor.white.cgColor, background.cgColor]
     }
     
     private func layoutCardStackView() {
@@ -180,11 +195,11 @@ class PokemonListViewController: UIViewController {
 
 extension PokemonListViewController: SwipeCardStackDataSource {
     func cardStack(_ cardStack: SwipeCardStack, cardForIndexAt index: Int) -> SwipeCard {
-        return card(fromImage: cardImages[index])
+        return card(id: viewStore.pokemonList[index].id)
     }
     
     func numberOfCards(in cardStack: SwipeCardStack) -> Int {
-        return cardImages.count
+        return viewStore.pokemonList.count
     }
 }
 
