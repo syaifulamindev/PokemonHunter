@@ -9,6 +9,7 @@
 import UIKit
 import Shuffle
 import PokemonHunterKit
+import PokemonHunterUI
 
 public class MyPokemonListCell: UITableViewCell {
     //    var content: SwipeCard = SwipeCard()

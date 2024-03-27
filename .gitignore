@@ -71,3 +71,4 @@ Tuist/Dependencies
 .build
 .package.resolved
 Package.resolved
+graph.png
