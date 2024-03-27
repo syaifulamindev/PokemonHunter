@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TextfieldAlertController: UIAlertController {
+public class TextfieldAlertController: UIAlertController {
 //    init(title: String?, message: String) {
 //        super.init(nibName: nil, bundle: nil)
 //        self.title = title
@@ -21,7 +21,7 @@ class TextfieldAlertController: UIAlertController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
-    func setup(placeholder: String, actionTitle: String, handler: @escaping (String?) -> Void) {
+    public func setup(placeholder: String, actionTitle: String, handler: @escaping (String?) -> Void) {
         addTextField { textfield in
             textfield.placeholder = placeholder
         }
